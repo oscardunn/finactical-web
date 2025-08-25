@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Finactical — Live Metrics</title>
+  <link rel="stylesheet" href="./assets/styles.css" />
+  <!-- If you keep Chart.js on a CDN, pin and use SRI; or self-host in assets/vendor -->
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"
+          integrity="sha384-+M3JkQzZXD5x1y1k5pHkq6CwM2lZPtfm2xA8+u2w0a+oU0lQhKX5q7U9SClg3D5M"
+          crossorigin="anonymous"></script>
+  <script defer src="./assets/app.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Finactical — Live Metrics</h1>
+    <div class="controls">
+      <input id="apiBase" type="text" placeholder="https://api.yourdomain.com" />
+      <select id="refresh">
+        <option value="10">Refresh 10s</option>
+        <option value="30" selected>Refresh 30s</option>
+        <option value="60">Refresh 60s</option>
+        <option value="0">Manual</option>
+      </select>
+      <button id="apply">Apply</button>
+      <button id="refreshNow">Refresh</button>
+    </div>
+  </header>
+
+  <main>
+    <div id="alert" class="banner"></div>
+
+    <section class="kpis">
+      <div class="kpi"><div class="label">Trades</div><div class="value" id="k_trades">—</div></div>
+      <div class="kpi"><div class="label">Win rate</div><div class="value" id="k_win">—</div></div>
+      <div class="kpi"><div class="label">Profit factor</div><div class="value" id="k_pf">—</div></div>
+      <div class="kpi"><div class="label">Net P&L</div><div class="value" id="k_pnl">—</div></div>
+    </section>
+
+    <section class="charts">
+      <div class="panel">
+        <h3>Equity Curve</h3>
+        <canvas id="equityChart"></canvas>
+        <div class="status" id="equityMeta"></div>
+      </div>
+      <div class="panel">
+        <h3>Drawdown</h3>
+        <canvas id="ddChart"></canvas>
+        <div class="status" id="ddMeta"></div>
+      </div>
+    </section>
+
+    <footer><div id="footerMeta">Last update: — • API: —</div></footer>
+  </main>
+</body>
+</html>
