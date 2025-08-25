@@ -1,0 +1,6 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { --muted: #8a93a6; }
+.muted { color: var(--muted); }
