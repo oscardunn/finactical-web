@@ -1,7 +1,7 @@
 # finactical-web
 Front end for Fintactical
 
-# Finactical React Skeleton (Vite + Tailwind + Chart.js)
+# Finactical React Skeleton (Vite + Tailwind)
 
 ## Quick start
 1) Copy `.env.example` to `.env` and set `VITE_API_BASE`.

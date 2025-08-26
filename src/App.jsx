@@ -4,6 +4,7 @@ import TradesTable from "/Users/uncleosk/Finactical-web/finactical-web/src/compo
 import ChartLine from "/Users/uncleosk/Finactical-web/finactical-web/src/components/chartline.jsx";
 import ThemeToggle from "/Users/uncleosk/Finactical-web/finactical-web/src/components/themetoggle.jsx";
 import { RefreshCw, FileDown } from "lucide-react";
+import StatCard from "/Users/uncleosk/Finactical-web/finactical-web/src/components/statcard.jsx";
 
 const initApi = () =>
   localStorage.getItem("apiBase") ||
@@ -26,6 +27,7 @@ export default function App() {
   const [error, setError] = useState("");
   const [trades, setTrades] = useState([]);
   const timer = useRef(null);
+  const prevKpi = useRef(null);
 
   const fmtPct = (x) => (x == null ? "—" : (x * 100).toFixed(1) + "%");
   const fmtNum = (x) =>
@@ -85,6 +87,21 @@ function handleRefreshClick() {
     [equity.ts]
   );
 
+    const deltas = useMemo(() => {if (!kpi || !prevKpi.current) return {};
+    const pct = (curr, prev) =>
+      prev == null || curr == null || prev === 0 ? null : ((curr - prev) / Math.abs(prev)) * 100;
+    return {
+      trades: pct(kpi.trades, prevKpi.current.trades),
+      win_rate: pct(kpi.win_rate, prevKpi.current.win_rate),
+      profit_factor: pct(kpi.profit_factor, prevKpi.current.profit_factor),
+      net_pnl: pct(kpi.net_pnl, prevKpi.current.net_pnl),
+    };
+  }, [kpi]);
+
+  useEffect(() => {
+    if (kpi) prevKpi.current = kpi; // update snapshot after deltas are computed
+  }, [kpi]);
+
   const dd = useMemo(() => {
     const arr = equity.equity || [];
     let peak = -Infinity,
@@ -95,7 +112,6 @@ function handleRefreshClick() {
     }
     return out;
   }, [equity.equity]);
-
 
 return (
   <div className="app-shell">
@@ -225,39 +241,26 @@ return (
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            <div className="bg-card border border-border rounded-xl p-4 transition hover:-translate-y-0.5">
-              <div className="text-sm muted">Trades</div>
-              <div className="text-2xl mt-1 tabular-nums">
-                {fmtNum(kpi?.trades)}
-              </div>
-            </div>
-            <div className="bg-card border border-border rounded-xl p-4 transition hover:-translate-y-0.5">
-              <div className="text-sm muted">Win rate</div>
-              <div className="text-2xl mt-1 tabular-nums">
-                {fmtPct(kpi?.win_rate)}
-              </div>
-            </div>
-            <div className="bg-card border border-border rounded-xl p-4 transition hover:-translate-y-0.5">
-              <div className="text-sm muted">Profit factor</div>
-              <div className="text-2xl mt-1 tabular-nums">
-                {kpi?.profit_factor == null ? "—" : fmtNum(kpi?.profit_factor)}
-              </div>
-            </div>
-            <div className="bg-card border border-border rounded-xl p-4 transition hover:-translate-y-0.5">
-              <div className="text-sm muted">Net P&amp;L</div>
-              <div
-                className={
-                  "text-2xl mt-1 tabular-nums " +
-                  ((kpi?.net_pnl || 0) > 0
-                    ? "text-green-500"
-                    : (kpi?.net_pnl || 0) < 0
-                    ? "text-red-400"
-                    : "")
-                }
-              >
-                {fmtNum(kpi?.net_pnl)}
-              </div>
-            </div>
+            <StatCard
+              label="Trades"
+              value={fmtNum(kpi?.trades)}
+              delta={deltas.trades != null ? Number(deltas.trades.toFixed(1)) : null}
+            />
+            <StatCard
+              label="Win rate"
+              value={fmtPct(kpi?.win_rate)}
+              delta={deltas.win_rate != null ? Number(deltas.win_rate.toFixed(1)) : null}
+            />
+            <StatCard
+              label="Profit factor"
+              value={kpi?.profit_factor == null ? "—" : fmtNum(kpi?.profit_factor)}
+              delta={deltas.profit_factor != null ? Number(deltas.profit_factor.toFixed(1)) : null}
+            />
+            <StatCard
+              label="Net P&L"
+              value={fmtNum(kpi?.net_pnl)}
+              delta={deltas.net_pnl != null ? Number(deltas.net_pnl.toFixed(1)) : null}
+            />
           </div>
         )}
       </section>
@@ -290,7 +293,7 @@ return (
             <TradesTable trades={trades} />
           ) : (
             <div className="rounded-md border skeleton border-border bg-card p-6 text-center muted">
-              No recent trades yet. Check your API base or try again.
+              No recent trades 
             </div>
           )}
         </div>

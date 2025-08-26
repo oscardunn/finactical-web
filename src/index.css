@@ -114,7 +114,7 @@
     );
     animation: skeleton-shimmer 1.75s linear infinite;
   }
-  .header-shadow { box-shadow: 0 12px 13px -13px color-mix(in oklab, var(--text) 28%, transparent); }
+  .header-shadow { box-shadow: 0 10px 10px -13px color-mix(in oklab, var(--text) 28%, transparent); }
 
   .icon-btn {
     background: transparent;
@@ -134,12 +134,10 @@
 
   :root .icon-btn:hover {
     background: color-mix(in oklab, var(--accent) 8%, transparent);
-    box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent) 20%, transparent);
   }
 
   .dark .icon-btn:hover {
     background: color-mix(in oklab, var(--accent) 12%, transparent);
-    box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent) 28%, transparent);
   }
 
   .icon-btn:focus-visible {

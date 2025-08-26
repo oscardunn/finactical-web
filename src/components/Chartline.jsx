@@ -1,53 +1,70 @@
-
-import React from "react";
-import { Line } from "react-chartjs-2";
+import React, { useMemo } from "react";
 import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  CartesianGrid,
+  XAxis,
+  YAxis,
   Tooltip,
-  Legend,
-} from "chart.js";
+} from "recharts";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Tooltip,
-  Legend
-);
-
-
-export default function ChartLine({ data }) {
-  const rows = useMemo(
-    () => (data?.ts || []).map((t, i) => ({ t, y: data.equity[i] })),
-    [data]
-  );
+export default function ChartLine({
+  labels = [],
+  data = [],
+  title = "",
+  yTickFormatter,
+}) {
+  // Build rows once per props change
+  const rows = useMemo(() => {
+    const n = Math.min(labels.length, data.length);
+    const out = new Array(n);
+    for (let i = 0; i < n; i++) out[i] = { t: labels[i], y: data[i] };
+    return out;
+  }, [labels, data]);
 
   return (
-    <div className="rounded-2xl border bg-card p-4">
-      <div className="text-sm text-muted-foreground mb-2">Equity</div>
-      <div className="h-64">
+    <div className="rounded-2xl border border-border bg-card p-4">
+      {title ? <div className="text-sm muted mb-2">{title}</div> : null}
+      <div className="h-72">
         <ResponsiveContainer>
-          <AreaChart data={rows} margin={{ left: 8, right: 8, top: 10, bottom: 0 }}>
+          <AreaChart
+            data={rows}
+            margin={{ left: 8, right: 8, top: 10, bottom: 0 }}
+          >
             <defs>
-              <linearGradient id="fillEquity" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="currentColor" stopOpacity={0.25}/>
-                <stop offset="95%" stopColor="currentColor" stopOpacity={0}/>
+              <linearGradient id="fillArea" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="currentColor" stopOpacity={0.25} />
+                <stop offset="95%" stopColor="currentColor" stopOpacity={0} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeOpacity={0.15} vertical={false} />
-            <XAxis dataKey="t" hide />
-            <YAxis width={48} tickLine={false} axisLine={false} tickMargin={6} />
-            <Tooltip
-              contentStyle={{ borderRadius: 12, border: "1px solid hsl(var(--border))" }}
-              labelFormatter={() => ""}
-              formatter={(v) => [v, "Equity"]}
+            <XAxis dataKey="t" tick={false} axisLine={false} />
+            <YAxis
+              width={56}
+              tickLine={false}
+              axisLine={false}
+              tickMargin={6}
+              tickFormatter={yTickFormatter}
             />
-            <Area type="monotone" dataKey="y" stroke="currentColor" fill="url(#fillEquity)" />
+            <Tooltip
+              contentStyle={{
+                borderRadius: 12,
+                border: "1px solid var(--border)",
+                background: "var(--card)",
+                color: "var(--text)",
+              }}
+              labelStyle={{ color: "var(--muted)" }}
+              formatter={(v) => [v, title || "Value"]}
+            />
+            <Area
+              type="monotone"
+              dataKey="y"
+              stroke="currentColor"
+              fill="url(#fillArea)"
+              strokeWidth={1.5}
+              isAnimationActive={false}
+            />
           </AreaChart>
         </ResponsiveContainer>
       </div>

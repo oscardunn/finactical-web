@@ -1,11 +1,11 @@
-// components/StatCard.jsx
 import { motion } from "framer-motion";
 
 export default function StatCard({ label, value, delta, icon: Icon }) {
   const up = delta > 0;
   return (
     <motion.div
-      whileHover={{ y: -2 }}
+      whileHover={{ y: -10, scale: 1.02 }}
+      whileTap={{ scale: 0.6 }}
       className="rounded-xl border bg-card p-4 shadow-sm"
     >
       <div className="flex items-center justify-between">

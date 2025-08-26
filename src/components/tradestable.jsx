@@ -34,8 +34,44 @@ export default function TradesTable({ trades = [] }) {
     );
   }, [trades, q]);
 
+  function download(filename, type, content) {
+    const blob = new Blob([content], { type });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function toCSV(rows) {
+    if (!rows?.length) return "";
+    const cols = Array.from(
+      rows.reduce(
+        (set, r) => (Object.keys(r).forEach((k) => set.add(k)), set),
+        new Set()
+      )
+    );
+    const esc = (v) => {
+      if (v == null) return "";
+      const s = String(v);
+      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const head = cols.join(",");
+    const body = rows.map((r) => cols.map((c) => esc(r[c])).join(",")).join("\n");
+    return head + "\n" + body;
+  }
+
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const pageData = filtered.slice((page - 1) * pageSize, page * pageSize);
+
+const ts = new Date().toISOString().replace(/[:.]/g, "-");
+  const handleExportJSON = () =>
+    download(`trades_${ts}.json`, "application/json;charset=utf-8", JSON.stringify(filtered, null, 2));
+  const handleExportCSV = () =>
+    download(`trades_${ts}.csv`, "text/csv;charset=utf-8", toCSV(filtered));
 
   return (
     <div className="space-y-3">
@@ -52,6 +88,24 @@ export default function TradesTable({ trades = [] }) {
         <div className="text-sm muted">
           {filtered.length} trades • page {page}/{totalPages}
         </div>
+    <div className="ml-auto flex items-center gap-2">
+      <button
+        className="icon-btn"
+        title="Download JSON"
+        onClick={handleExportJSON}
+        aria-label="Download JSON"
+      >
+        JSON
+      </button>
+      <button
+        className="icon-btn"
+        title="Download CSV"
+        onClick={handleExportCSV}
+        aria-label="Download CSV"
+      >
+        CSV
+      </button>
+    </div>
       </div>
 
       <div className="overflow-auto border border-border rounded-xl">
