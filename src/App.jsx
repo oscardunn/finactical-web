@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { getKPI, getEquity } from "./lib/api.js";
+import { getKPI, getEquity, getTrades } from "./lib/api.js";
+import TradesTable from "/Users/uncleosk/Finactical-web/finactical-web/src/components/tradestable.jsx";
 import ChartLine from "/Users/uncleosk/Finactical-web/finactical-web/src/components/chartline.jsx";
 import ThemeToggle from "/Users/uncleosk/Finactical-web/finactical-web/src/components/themetoggle.jsx";
 
@@ -18,6 +19,7 @@ export default function App() {
   const [kpi, setKpi] = useState(null);
   const [equity, setEquity] = useState({ ts: [], equity: [] });
   const [error, setError] = useState("");
+  const [trades, setTrades] = useState([]);
   const timer = useRef(null);
 
   const fmtPct = (x) => (x == null ? "—" : (x * 100).toFixed(1) + "%");
@@ -29,9 +31,14 @@ export default function App() {
   async function loadAll() {
     setError("");
     try {
-      const [k, e] = await Promise.all([getKPI(apiBase), getEquity(apiBase)]);
+      const [k, e, t] = await Promise.all([
+        getKPI(apiBase),
+        getEquity(apiBase),
+        getTrades(apiBase, { limit: 500 })
+      ]);
       setKpi(k);
       setEquity(e);
+      setTrades(t);
     } catch (err) {
       setError(`API unreachable: ${err.message}`);
     }
@@ -78,9 +85,7 @@ export default function App() {
         <div className="max-w-6xl mx-auto p-4 flex flex-col md:flex-row gap-3 items-start md:items-center justify-between">
           <div>
             <h1 className="text-lg">Finactical</h1>
-            <div className="text-sm muted">
-              Live Metrics Dashboard
-            </div>
+            <div className="text-sm muted">Live Metrics Dashboard</div>
           </div>
           <div className="flex gap-2 items-center flex-wrap">
             <input
@@ -116,7 +121,6 @@ export default function App() {
             {error}
           </div>
         )}
-
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <div className="bg-card border border-border rounded-xl p-4">
             <div className="text-sm muted">Trades</div>
@@ -148,7 +152,6 @@ export default function App() {
             </div>
           </div>
         </section>
-
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-3 mt-3">
           <div className="bg-panel border border-border rounded-xl p-4">
             <div className="mb-2 font-medium">Equity Curve</div>
@@ -164,6 +167,13 @@ export default function App() {
           </div>
         </section>
 
+        <section className="mt-3">
+          <div className="bg-panel border border-border rounded-xl p-4">
+             <div className="mb-2 font-medium">Recent Trades</div>
+             <TradesTable trades={trades} />+{" "}
+          </div>
+        </section>
+        
         <footer className="text-sm muted border-t border-border mt-6 pt-4">
           Last update: {new Date().toLocaleString()} • API: {apiBase}
         </footer>
