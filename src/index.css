@@ -1,6 +1,32 @@
+/* stylelint-disable at-rule-no-unknown */
+/* @tailwindcss */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root { --muted: #8a93a6; }
-.muted { color: var(--muted); }
+:root{
+  --panel:#ffffff;
+  --card:#ffffff;
+  --border:#e5e7eb;
+  --text:#0f172a;
+  --muted:#6b7280;
+  --accent:#2563eb;
+}
+
+.dark{
+  --panel:#0b1220;
+  --card:#0f172a;
+  --border:#23314f;
+  --text:#e5e7eb;
+  --muted:#9ca3af;
+  --accent:#3b82f6;
+}
+
+@layer utilities{
+  .bg-panel{ background: var(--panel); }
+  .bg-card{ background: var(--card); }
+  .border-border{ border-color: var(--border); }
+  .muted{ color: var(--muted); }
+  .text-basecolor{ color: var(--text); }
+  .bg-accent{ background: var(--accent); }
+}

@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { getKPI, getEquity } from "./lib/api.js";
 import ChartLine from "/Users/uncleosk/Finactical-web/finactical-web/src/components/chartline.jsx";
+import ThemeToggle from "/Users/uncleosk/Finactical-web/finactical-web/src/components/themetoggle.jsx";
 
 const initApi = () =>
   localStorage.getItem("apiBase") ||
@@ -76,9 +77,9 @@ export default function App() {
       <header className="border-b border-border bg-panel">
         <div className="max-w-6xl mx-auto p-4 flex flex-col md:flex-row gap-3 items-start md:items-center justify-between">
           <div>
-            <h1 className="text-lg">Finactical — Live Metrics</h1>
+            <h1 className="text-lg">Finactical</h1>
             <div className="text-sm muted">
-              React + Vite • Static UI • API via tunnel
+              Live Metrics Dashboard
             </div>
           </div>
           <div className="flex gap-2 items-center flex-wrap">
@@ -104,6 +105,7 @@ export default function App() {
             >
               Refresh
             </button>
+            <ThemeToggle />
           </div>
         </div>
       </header>
