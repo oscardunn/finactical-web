@@ -4,29 +4,84 @@
 @tailwind components;
 @tailwind utilities;
 
-:root{
-  --panel:#ffffff;
-  --card:#ffffff;
-  --border:#e5e7eb;
-  --text:#0f172a;
-  --muted:#6b7280;
-  --accent:#2563eb;
+:root {
+  --panel: #f9fafb;        /* light grey background */
+  --card: #ffffff;         /* crisp white cards */
+  --border: #d1d5db;       /* slate-300 border */
+  --text: #312e81;         /* near-black text */
+  --muted: #6b7280;        /* slate-500 muted */
+  --accent: #6217e3;       /* purple-600 as main accent */
 }
 
-.dark{
-  --panel:#0b1220;
-  --card:#0f172a;
-  --border:#23314f;
-  --text:#e5e7eb;
-  --muted:#9ca3af;
-  --accent:#3b82f6;
+.dark {
+  --panel: #0a0f1c;        /* deep navy background */
+  --card: #1e1b29;         /* subtle purple-tinted dark card */
+  --border: #312e81;       /* indigo-900 for borders */
+  --text: #f3f4f6;         /* slate-100 text */
+  --muted: #9ca3af;        /* slate-400 muted */
+  --accent: #6e05d0;       /* purple-500 accent */
 }
 
-@layer utilities{
-  .bg-panel{ background: var(--panel); }
-  .bg-card{ background: var(--card); }
-  .border-border{ border-color: var(--border); }
-  .muted{ color: var(--muted); }
-  .text-basecolor{ color: var(--text); }
-  .bg-accent{ background: var(--accent); }
+
+
+@layer utilities {
+  .bg-panel { background: var(--panel); }
+  .bg-card { background: var(--card); }
+  .border-border { border-color: var(--border); }
+  .muted { color: var(--muted); }
+  .text-basecolor { color: var(--text); }
+
+  .bg-accent {
+    background: var(--accent);
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  /* Light mode hover */
+  :root .bg-accent:hover {
+    background: #7836e1; /* purple-700 */
+  }
+
+  /* Dark mode hover */
+  .dark .bg-accent:hover {
+    background: #8c2fe2; /* purple-500 (lighter, stands out on dark) */
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.6); /* subtle purple glow */
+  }
+
+  /* Optional: focus state for accessibility */
+  .bg-accent:focus-visible {
+    outline: 2px solid #c084fc; /* purple-400 */
+    outline-offset: 2px;
+  }
 }
+
+@layer components {
+  .icon-btn {
+    background: transparent;
+    border: none;
+    padding: 0.5rem;          /* ~8px */
+    line-height: 1;
+    border-radius: 9999px;    /* fully round */
+    color: var(--text);
+    transition: background-color .2s ease, box-shadow .2s ease, transform .1s ease;
+  }
+
+  /* Light-mode hover glow */
+  :root .icon-btn:hover {
+    background: rgba(98, 23, 227, 0.08);    /* subtle purple wash */
+    box-shadow: 0 0 0 4px rgba(98, 23, 227, 0.20);
+  }
+
+  /* Dark-mode hover glow (slightly brighter) */
+  .dark .icon-btn:hover {
+    background: rgba(174, 113, 255, 0.12);
+    box-shadow: 0 0 0 4px rgba(174, 113, 255, 0.28);
+  }
+
+  /* Focus ring for keyboard users */
+  .icon-btn:focus-visible {
+    outline: 2px solid #c084fc;  /* purple-400 */
+    outline-offset: 2px;
+  }
+}
+
+
