@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { getKPI, getEquity } from "./lib/api.js";
-import ChartLine from "src/components/Chartline.jsx";
+import ChartLine from "/Users/uncleosk/Finactical-web/finactical-web/src/components/chartline.jsx";
 
 const initApi = () =>
   localStorage.getItem("apiBase") ||
