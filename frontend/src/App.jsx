@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { getKPI, getEquity, getTrades } from "./lib/api.js";
-import TradesTable from "/Users/uncleosk/Finactical-web/finactical-web/src/components/tradestable.jsx";
-import ChartLine from "/Users/uncleosk/Finactical-web/finactical-web/src/components/chartline.jsx";
-import ThemeToggle from "/Users/uncleosk/Finactical-web/finactical-web/src/components/themetoggle.jsx";
+import TradesTable from "/Users/uncleosk/Finactical-web/finactical-web/frontend/src/components/tradestable.jsx";
+import ChartLine from "/Users/uncleosk/Finactical-web/finactical-web/frontend/src/components/chartline.jsx";
+import ThemeToggle from "/Users/uncleosk/Finactical-web/finactical-web/frontend/src/components/themetoggle.jsx";
 import { RefreshCw, FileDown } from "lucide-react";
-import StatCard from "/Users/uncleosk/Finactical-web/finactical-web/src/components/statcard.jsx";
+import StatCard from "/Users/uncleosk/Finactical-web/finactical-web/frontend/src/components/statcard.jsx";
 
 const initApi = () =>
   localStorage.getItem("apiBase") ||
