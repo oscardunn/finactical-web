@@ -1,40 +1,26 @@
-const DEFAULT_BASE =
-  import.meta.env.VITE_API_BASE || "https://api.yourdomain.com";
+const API = (base) => base || "http://localhost:8000/api/v1";
 
-export async function getKPI(base = DEFAULT_BASE) {
-  const url = base.replace(/\/$/, "") + "/kpi";
-  const res = await fetch(url, { cache: "no-store" });
-  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-  return res.json();
+export async function getKPI(base) {
+  const r = await fetch(`${API(base)}/kpi`);
+  if (!r.ok) throw new Error("KPI fetch failed");
+  return r.json(); // → { trades, win_rate, profit_factor, net_pnl, ... }
 }
 
-export async function getEquity(base = DEFAULT_BASE) {
-  const url = base.replace(/\/$/, "") + "/equity";
-  const res = await fetch(url, { cache: "no-store" });
-  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-  return res.json();
+export async function getEquity(base) {
+  const r = await fetch(`${API(base)}/equity`);
+  if (!r.ok) throw new Error("Equity fetch failed");
+  return r.json(); // → { ts: [...], equity: [...] }
 }
 
-export async function getTrades(apiBase, { limit = 500 } = {}) {
-  const base = String(apiBase || "").replace(/\/$/, "");
-  const res = await fetch(`${base}/trades?limit=${limit}`);
-  if (!res.ok) throw new Error(`Trades HTTP ${res.status}`);
-  const data = await res.json();
-
-  // Normalize a few common shapes -> [{id,time,symbol,side,qty,price,pnl}]
-  const items = Array.isArray(data?.trades)
-    ? data.trades
-    : Array.isArray(data)
-    ? data
-    : [];
-  return items.map((r, i) => ({
-    id: r.id ?? r.trade_id ?? i,
-    time: r.time ?? r.timestamp ?? r.close_time ?? r.open_time,
-    symbol: r.symbol ?? r.ticker ?? "BTCUSDT",
-    side: r.side ?? r.action ?? r.type,
-    qty: r.qty ?? r.quantity ?? r.size,
-    price: r.price ?? r.fill_price ?? r.avg_price ?? r.entry_price,
-    pnl: r.pnl ?? r.profit ?? r.p_and_l,
-  }));
+export async function getTrades(
+  base,
+  { limit = 100, offset = 0, status = "ALL" } = {}
+) {
+  const url = new URL(`${API(base)}/trades`);
+  url.searchParams.set("limit", limit);
+  url.searchParams.set("offset", offset);
+  url.searchParams.set("status", status);
+  const r = await fetch(url);
+  if (!r.ok) throw new Error("Trades fetch failed");
+  return r.json(); // → array of trades
 }
-
