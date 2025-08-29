@@ -166,6 +166,8 @@ CORS(
 
 # on pi, set CORS_ORIGINS to your frontend domain, e.g.
 # export CORS_ORIGINS="https://app.yourdomain.com"
+# export API_KEY=devkey
+# export DATA_DB_FILE=/tmp/DB/data.db
 
 from flask import abort
 API_KEY = os.getenv("API_KEY")

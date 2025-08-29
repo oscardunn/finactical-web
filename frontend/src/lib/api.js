@@ -1,26 +1,43 @@
 const API = (base) => base || "http://localhost:8000/api/v1";
 
-export async function getKPI(base) {
-  const r = await fetch(`${API(base)}/kpi`);
-  if (!r.ok) throw new Error("KPI fetch failed");
-  return r.json(); // → { trades, win_rate, profit_factor, net_pnl, ... }
+export async function getKPI(apiBase) {
+  const res = await fetch(`${apiBase}/kpi`, {
+    headers: { "x-api-key": localStorage.getItem("apiKey") },
+  });
+  if (!res.ok) throw new Error(await res.text());
+  const j = await res.json();
+  return {
+    trades: j.trades_count,
+    win_rate: j.win_rate_pct / 100,
+    profit_factor: j.profit_factor,
+    net_pnl: j.avg_trade_pnl, // or sum of pnls depending on meaning
+  };
 }
 
-export async function getEquity(base) {
-  const r = await fetch(`${API(base)}/equity`);
-  if (!r.ok) throw new Error("Equity fetch failed");
-  return r.json(); // → { ts: [...], equity: [...] }
+export async function getEquity(apiBase) {
+  const res = await fetch(`${apiBase}/equity`, {
+    headers: { "x-api-key": localStorage.getItem("apiKey") },
+  });
+  if (!res.ok) throw new Error(await res.text());
+  const j = await res.json();
+  return {
+    ts: j.points.map((p) => p.ts),
+    equity: j.points.map((p) => p.equity),
+  };
 }
 
-export async function getTrades(
-  base,
-  { limit = 100, offset = 0, status = "ALL" } = {}
-) {
-  const url = new URL(`${API(base)}/trades`);
-  url.searchParams.set("limit", limit);
-  url.searchParams.set("offset", offset);
-  url.searchParams.set("status", status);
-  const r = await fetch(url);
-  if (!r.ok) throw new Error("Trades fetch failed");
-  return r.json(); // → array of trades
+export async function getTrades(apiBase, { limit = 100 }) {
+  const res = await fetch(`${apiBase}/trades?limit=${limit}`, {
+    headers: { "x-api-key": localStorage.getItem("apiKey") },
+  });
+  if (!res.ok) throw new Error(await res.text());
+  const j = await res.json();
+  return j.items.map((it) => ({
+    id: it.id,
+    time: it.timestamp,
+    side: it.action.includes("Sell") ? "SELL" : "BUY", // simplify
+    price: it.trade_price,
+    qty: it.position,
+    pnl: it.pnl,
+  }));
 }
