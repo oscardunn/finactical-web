@@ -114,8 +114,9 @@ def kpis_from_trade_table(rows: List[sqlite3.Row], eq_series: List[Tuple[int, fl
         out["total_return_pct"] = ret_total * 100.0
 
         days = max(1, int((eq_series[-1][0] - eq_series[0][0]) // 86400))
-        years = days / 365.25
-        out["cagr_pct"] = (((eq_vals[-1] / eq_vals[0]) ** (1/years) - 1) * 100.0) if years > 0 else out["total_return_pct"]
+        span_years = max(1e-6, (eq_series[-1][0] - eq_series[0][0]) / 86400 / 365.25)
+        out["cagr_pct"] = ((eq_vals[-1] / eq_vals[0]) ** (1/span_years) - 1) * 100.0
+
 
         mdd, mdd_dur = max_drawdown(eq_vals)
         out["max_drawdown_pct"] = mdd * 100.0
@@ -152,7 +153,16 @@ def paginate(items: List[Dict[str, Any]], limit: int, offset: int) -> Tuple[int,
     return total, items[offset: offset + limit]
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": os.getenv("CORS_ORIGINS").split(",")}})
+orig = os.getenv("CORS_ORIGINS")
+CORS(
+    app,
+    resources={r"/api/*": {
+        "origins": (orig.split(",") if orig else "*"),
+        "allow_headers": ["Content-Type", "x-api-key"],
+        "methods": ["GET", "OPTIONS"],
+    }},
+)
+
 
 # on pi, set CORS_ORIGINS to your frontend domain, e.g.
 # export CORS_ORIGINS="https://app.yourdomain.com"
@@ -168,10 +178,16 @@ limiter = Limiter(get_remote_address, app=app, default_limits=["120/minute"])
 
 @app.before_request
 def require_key():
-    if request.path.startswith("/api/"):  # allow /health below if you like
+    # Always allow CORS preflight and health
+    if request.method == "OPTIONS":
+        return
+    if request.path == "/api/v1/health":
+        return
+    if request.path.startswith("/api/"):
         key = request.headers.get("x-api-key")
         if not API_KEY or key != API_KEY:
             abort(401)
+
 
 @app.get("/api/v1/health")
 def health():
